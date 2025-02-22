@@ -20,6 +20,7 @@ func NewRouter() *chi.Mux {
 	// Register routes
 	router.Route("/api", func(r chi.Router) {
 		r.Mount("/dashboard", handlers.DashboardRoutes())
+		r.Mount("/map", handlers.MapRoutes()) // Add this line
 	})
 
 	return router
