@@ -2,6 +2,7 @@ package server
 
 import (
 	"hyper-api/handlers"
+	"hyper-api/utils"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -14,6 +15,7 @@ func NewRouter() *chi.Mux {
 	// Middleware
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
+	router.Use(utils.CorsMiddleware)
 
 	// Register routes
 	router.Route("/api", func(r chi.Router) {
