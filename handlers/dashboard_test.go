@@ -15,8 +15,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// setupWorldMapTestDB initializes and returns a connection to the test database
-func setupWorldMapTestDB(t *testing.T) *gorm.DB {
+// setupTestDB initializes and returns a connection to the test database
+func setupTestDB(t *testing.T) *gorm.DB {
 	// Load the .env file
 	err := godotenv.Load("../.env") // Adjust the path to your .env file if needed
 	if err != nil {
@@ -50,7 +50,7 @@ func setupWorldMapTestDB(t *testing.T) *gorm.DB {
 // TestDatabaseConnectivity tests and logs database connectivity
 func TestDatabaseConnectivity(t *testing.T) {
 	// Set up the test database
-	db := setupWorldMapTestDB(t)
+	db := setupTestDB(t)
 
 	// Test if the database is reachable by running a simple query
 	var result int
@@ -69,7 +69,7 @@ func TestDatabaseConnectivity(t *testing.T) {
 // TestGetDashboardData tests the GetDashboardData handler
 func TestGetDashboardData(t *testing.T) {
 	// Set up the test database
-	setupWorldMapTestDB(t)
+	setupTestDB(t)
 
 	// Create a request to pass to the handler
 	req, err := http.NewRequest("GET", "/", nil)
@@ -102,4 +102,18 @@ func TestGetDashboardData(t *testing.T) {
 	// Assert that the response contains the expected data
 	assert.NotEmpty(t, response.CarbonFootprint, "CarbonFootprint data should not be empty")
 	assert.NotEmpty(t, response.PollutionLevels, "PollutionLevels data should not be empty")
+
+	// Check CarbonFootprint data
+	for i, footprint := range response.CarbonFootprint {
+		// Check if MonthStr is a string and not empty
+		assert.IsType(t, "", footprint.MonthStr, "MonthStr in CarbonFootprint %d is not a string", i)
+		assert.NotEmpty(t, footprint.MonthStr, "MonthStr in CarbonFootprint %d is empty", i)
+
+	}
+	// Check PollutionLevels data
+	for i, pollution := range response.PollutionLevels {
+		// Check if Level is an integer and greater than 0
+		assert.IsType(t, 0, pollution.Level, "Level in PollutionLevels %d is not an integer", i)
+		assert.Greater(t, pollution.Level, 0, "Level in PollutionLevels %d is not greater than 0", i)
+	}
 }

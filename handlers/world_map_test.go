@@ -15,8 +15,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// setupTestDB initializes and returns a connection to the test database
-func setupTestDB(t *testing.T) *gorm.DB {
+// setupWorldMapTestDB initializes and returns a connection to the test database
+func setupWorldMapTestDB(t *testing.T) *gorm.DB {
 	// Load the .env file
 	err := godotenv.Load("../.env") // Adjust the path to your .env file if needed
 	if err != nil {
@@ -50,7 +50,7 @@ func setupTestDB(t *testing.T) *gorm.DB {
 // TestGetMapUsers tests the GetMapUsers handler
 func TestGetMapUsers(t *testing.T) {
 	// Set up the test database
-	setupTestDB(t)
+	setupWorldMapTestDB(t)
 
 	// Create a request to pass to the handler
 	req, err := http.NewRequest("GET", "/users", nil)
@@ -80,6 +80,20 @@ func TestGetMapUsers(t *testing.T) {
 	// Print the decoded response for debugging
 	t.Logf("Decoded Response: %+v", mapUsers)
 
-	// Assert that the response contains the expected data
-	assert.NotEmpty(t, mapUsers, "MapUsers data should not be empty")
+	// Assert that the response contains more than 0 users
+	assert.Greater(t, len(mapUsers), 0, "Expected more than 0 users, got %d", len(mapUsers))
+
+	// Optionally, check for specific fields in the response
+	if len(mapUsers) > 0 {
+		for i, user := range mapUsers {
+			// Check if the Name field is a string
+			assert.IsType(t, "", user.Name, "Name field in user %d is not a string", i)
+		}
+	}
+	// Check for unique user IDs
+	userIDs := make(map[uint]bool)
+	for _, user := range mapUsers {
+		assert.False(t, userIDs[user.ID], "Duplicate user ID found: %d", user.ID)
+		userIDs[user.ID] = true
+	}
 }
