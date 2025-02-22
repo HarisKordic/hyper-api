@@ -16,6 +16,7 @@ func NewRouter() *chi.Mux {
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 	router.Use(utils.CorsMiddleware)
+	router.Use(utils.RateLimitMiddleware)
 
 	// Register routes
 	router.Route("/api", func(r chi.Router) {
