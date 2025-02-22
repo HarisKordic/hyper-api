@@ -19,7 +19,7 @@ func UserRoutes() chi.Router {
 func GetUsers(w http.ResponseWriter, r *http.Request) {
 	var users []models.User
 
-	result := db.GetDB().Find(&users)
+	result := db.GetDB().Order("id desc").Limit(5).Find(&users)
 	if result.Error != nil {
 		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
 		return
