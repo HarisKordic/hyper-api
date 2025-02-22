@@ -12,7 +12,6 @@ import (
 	"time"
 )
 
-// Modify main.go
 func main() {
 	db.Init()
 	router := server.NewRouter()
