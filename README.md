@@ -38,3 +38,6 @@ curl http://localhost:8080/api/users
 
 ### Get user by email 
 curl http://localhost:8080/api/users/email/example@email.com
+
+## Unit testing
+Run the unit tests by executing: go test -v ./…
