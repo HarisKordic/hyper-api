@@ -15,8 +15,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// setupWorldMapTestDB initializes and returns a connection to the test database
-func setupWorldMapTestDB(t *testing.T) *gorm.DB {
+// setupTestDB initializes and returns a connection to the test database
+func setupTestDB(t *testing.T) *gorm.DB {
 	// Load the .env file
 	err := godotenv.Load("../.env") // Adjust the path to your .env file if needed
 	if err != nil {
@@ -47,32 +47,13 @@ func setupWorldMapTestDB(t *testing.T) *gorm.DB {
 	return gormDB
 }
 
-// TestDatabaseConnectivity tests and logs database connectivity
-func TestDatabaseConnectivity(t *testing.T) {
+// TestGetMapUsers tests the GetMapUsers handler
+func TestGetMapUsers(t *testing.T) {
 	// Set up the test database
-	db := setupWorldMapTestDB(t)
-
-	// Test if the database is reachable by running a simple query
-	var result int
-	err := db.Raw("SELECT 1").Scan(&result).Error
-	if err != nil {
-		t.Fatalf("Failed to execute query: %v", err)
-	}
-
-	// Log the result of the query
-	t.Logf("Database connectivity test result: SELECT 1 => %d", result)
-
-	// Assert that the query returned the expected result
-	assert.Equal(t, 1, result, "Database connectivity test failed: expected 1, got %d", result)
-}
-
-// TestGetDashboardData tests the GetDashboardData handler
-func TestGetDashboardData(t *testing.T) {
-	// Set up the test database
-	setupWorldMapTestDB(t)
+	setupTestDB(t)
 
 	// Create a request to pass to the handler
-	req, err := http.NewRequest("GET", "/", nil)
+	req, err := http.NewRequest("GET", "/users", nil)
 	if err != nil {
 		t.Fatalf("Failed to create request: %v", err)
 	}
@@ -81,7 +62,7 @@ func TestGetDashboardData(t *testing.T) {
 	rr := httptest.NewRecorder()
 
 	// Call the handler directly
-	GetDashboardData(rr, req)
+	GetMapUsers(rr, req)
 
 	// Print the response body for debugging
 	t.Logf("Response Body: %s", rr.Body.String())
@@ -90,16 +71,15 @@ func TestGetDashboardData(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rr.Code, "Handler returned wrong status code")
 
 	// Decode the response body
-	var response models.DashboardResponse
-	err = json.NewDecoder(rr.Body).Decode(&response)
+	var mapUsers []models.MapUser
+	err = json.NewDecoder(rr.Body).Decode(&mapUsers)
 	if err != nil {
 		t.Fatalf("Failed to decode response: %v", err)
 	}
 
 	// Print the decoded response for debugging
-	t.Logf("Decoded Response: %+v", response)
+	t.Logf("Decoded Response: %+v", mapUsers)
 
 	// Assert that the response contains the expected data
-	assert.NotEmpty(t, response.CarbonFootprint, "CarbonFootprint data should not be empty")
-	assert.NotEmpty(t, response.PollutionLevels, "PollutionLevels data should not be empty")
+	assert.NotEmpty(t, mapUsers, "MapUsers data should not be empty")
 }
