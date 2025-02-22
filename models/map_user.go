@@ -11,5 +11,5 @@ type MapUser struct {
 	Activity  string    `json:"activity"`
 	Timestamp time.Time `json:"timestamp"`
 	IconType  string    `json:"iconType"`
-	Emission  float64   `json:"emission"`
+	EmissionAmount  float64   `json:"emission_amount"`
 }
