@@ -12,6 +12,7 @@ import (
 func UserRoutes() chi.Router {
 	router := chi.NewRouter()
 	router.Get("/", GetUsers)
+	router.Get("/email/{email}", GetUserByEmail)
 	return router
 }
 
@@ -26,4 +27,18 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(users)
+}
+
+func GetUserByEmail(w http.ResponseWriter, r *http.Request) {
+	email := chi.URLParam(r, "email")
+	var user models.User
+
+	result := db.GetDB().Where("email = ?", email).First(&user)
+	if result.Error != nil {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(user)
 }
