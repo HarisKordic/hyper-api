@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Pull latest changes
+echo "Pulling latest changes..."
+git pull
+
 echo "Killing Go server if already running on port 8080..."
 fuser -k 8080/tcp || true
 
